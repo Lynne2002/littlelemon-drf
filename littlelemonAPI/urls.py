@@ -11,4 +11,5 @@ urlpatterns =[
     path('category/<int:pk>', views.category_detail, name='category-detail'),
     path('menu-items-des', views.menu_items_des),
     path('menuhtml', views.menu),
+    path('welcome', views.welcome)
 ]
