@@ -7,6 +7,10 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
+# TemplateHTMLRenderer
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.decorators import api_view, renderer_classes
+
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
@@ -52,3 +56,12 @@ def menu_items_des(request):
         serialized_item.is_valid(raise_exception=True)
         serialized_item.save()
         return Response(serialized_item.data, status.HTTP_201_CREATED)
+    
+
+# TemplateHTMLRenderer
+@api_view()
+@renderer_classes([TemplateHTMLRenderer])
+def menu(request):
+    items = MenuItem.objects.select_related('category').all()
+    serialized_item = MenuItemsSerializer(items, many=True)
+    return Response({'data': serialized_item.data}, template_name='menu-item.html')
