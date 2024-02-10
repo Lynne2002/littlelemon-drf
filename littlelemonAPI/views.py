@@ -11,6 +11,9 @@ from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
 from rest_framework.decorators import api_view, renderer_classes
 
+# CSV Renderer
+from rest_framework_csv.renderers import CSVRenderer
+
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
@@ -72,3 +75,12 @@ def menu(request):
 def welcome(request):
     data = '<html><body><h1>Welcome to LittleLemon API Project</h1></body></html>'
     return Response(data)
+
+#CSVRenderer
+@api_view()
+@renderer_classes([CSVRenderer])
+def menu_items_csv(request):
+    items = MenuItem.objects.select_related('category').all()
+    # add context for hyperlinks display
+    serialized_item = MenuHyperItemsSerializer(items, many=True, context={'request': request})
+    return Response(serialized_item.data)
