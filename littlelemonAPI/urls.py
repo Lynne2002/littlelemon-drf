@@ -13,4 +13,5 @@ urlpatterns =[
     path('menuhtml', views.menu),
     path('welcome', views.welcome),
     path('menu-items-csv', views.menu_items_csv),
+    path('menu-items-yaml', views.menu_items_yaml),
 ]
