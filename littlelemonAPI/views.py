@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
-# TemplateHTMLRenderer
-from rest_framework.renderers import TemplateHTMLRenderer
+# TemplateHTMLRenderer & StaticHTMLRenderer
+from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
 from rest_framework.decorators import api_view, renderer_classes
 
 class MenuItemsView(generics.ListCreateAPIView):
@@ -65,3 +65,10 @@ def menu(request):
     items = MenuItem.objects.select_related('category').all()
     serialized_item = MenuItemsSerializer(items, many=True)
     return Response({'data': serialized_item.data}, template_name='menu-item.html')
+
+# StaticHTMLRenderer
+@api_view(['GET'])
+@renderer_classes([StaticHTMLRenderer])
+def welcome(request):
+    data = '<html><body><h1>Welcome to LittleLemon API Project</h1></body></html>'
+    return Response(data)
