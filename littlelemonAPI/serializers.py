@@ -3,6 +3,9 @@ from .models import MenuItem
 from .models import Category
 from decimal import Decimal
 
+# Unique validator - uniquensess of a single field, i.e. no duplicates
+from rest_framework.validators import UniqueValidator
+
 class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
@@ -53,6 +56,13 @@ class MenuItemsSerializer(serializers.ModelSerializer):
         queryset = Category.objects.all(),
         view_name='category-detail'
     ) """
+
+    # OPTION 2 - Unique validation of title field
+    title = serializers.CharField(
+        max_length = 255,
+        validators = [UniqueValidator(queryset=MenuItem.objects.all())]
+    )
+
     class Meta:
         model = MenuItem
         fields =['id', 'title', 'price', 'stock','price_after_tax', 'category', 'category_id']
@@ -64,7 +74,18 @@ class MenuItemsSerializer(serializers.ModelSerializer):
         'price': {'min_value': 2},
         'stock':{'source':'inventory', 'min_value': 0}
          } """
-       
+        
+        # OPTION 1: Unique validation of title field
+        """ extra_kwargs = {
+            'title':{
+                'validators': [
+                    UniqueValidator(
+                        queryset=MenuItem.objects.all()
+                    )
+                ]
+            }
+        }
+        """
 
 
     def calculate_tax(self, product:MenuItem):
