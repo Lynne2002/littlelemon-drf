@@ -9,7 +9,7 @@ urlpatterns =[
     path('categories', views.CategoriesView.as_view()),
     # For hyperlink display
     path('category/<int:pk>', views.category_detail, name='category-detail'),
-    path('menu-items-des', views.menu_items_des),
+    path('menu-items-des/', views.menu_items_des),
     path('menuhtml', views.menu),
     path('welcome', views.welcome),
     path('menu-items-csv', views.menu_items_csv),
