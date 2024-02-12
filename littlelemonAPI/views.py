@@ -58,12 +58,33 @@ def menu_items_des(request):
         category_name = request.query_params.get('category')
         to_price = request.query_params.get('to_price')
 
+        # Search menu items
+        search = request.query_params.get('search')
+
 # Use 2 underscores -> linked to category model and linked to menu model
         if category_name:
             items = items.filter(category__title=category_name)
-
+        # if price = to_price -> equal price
         if to_price:
             items = items.filter(price__lte=to_price)#lte means price is less than or equal to a value
+         
+         # Starts with 
+        """  if search:
+            items = items.filter(title__startswith=search) """
+        
+         # Starts with - case insensitive
+        """  if search:
+            items = items.filter(title__istartswith=search) """
+
+        # Present anywhere in title
+        """ if search:
+            items = items.filter(title__contains=search) """
+        
+         # Present anywhere in title -case insensitive
+        if search:
+            items = items.filter(title__icontains=search)
+        
+
         serialized_item =MenuItemsSerializer(items, many=True)
         return Response(serialized_item.data)
     
