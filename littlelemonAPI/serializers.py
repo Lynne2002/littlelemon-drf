@@ -3,8 +3,11 @@ from .models import MenuItem
 from .models import Category
 from decimal import Decimal
 
-# Unique validator - uniquensess of a single field, i.e. no duplicates
+# Unique validator - uniqueness of a single field, i.e. no duplicates
 from rest_framework.validators import UniqueValidator
+
+# UniqueTogether validator - uniqueness of combination of two fields
+from rest_framework.validators import UniqueTogetherValidator
 
 class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,13 +38,13 @@ class MenuItemsSerializer(serializers.ModelSerializer):
     stock = serializers.IntegerField(source='inventory')
 
     # OPTION 3: Using validate_field() method
-    def validate_price(self,value):
+    """ def validate_price(self,value):
         if(value < 2):
             raise serializers.ValidationError('Price should not be less than 2.0')
         
     def validate_stock(self, value):
         if(value < 0):
-            raise serializers.ValidationError("Stock cannot be negative") 
+            raise serializers.ValidationError("Stock cannot be negative")  """
     
     # OPTION 4: Using the validate() method
     """ def validate(self, attrs):
@@ -58,10 +61,14 @@ class MenuItemsSerializer(serializers.ModelSerializer):
     ) """
 
     # OPTION 2 - Unique validation of title field
-    title = serializers.CharField(
+    """ title = serializers.CharField(
         max_length = 255,
+
+        # Unique validator
         validators = [UniqueValidator(queryset=MenuItem.objects.all())]
     )
+ """
+
 
     class Meta:
         model = MenuItem
@@ -86,6 +93,14 @@ class MenuItemsSerializer(serializers.ModelSerializer):
             }
         }
         """
+
+        # Unique together validator - combination of price + title should be unique items
+        validators = [
+            UniqueTogetherValidator(
+                queryset=MenuItem.objects.all(),
+                fields = ['title', 'price']
+            ),
+        ]
 
 
     def calculate_tax(self, product:MenuItem):
