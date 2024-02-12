@@ -61,6 +61,9 @@ def menu_items_des(request):
         # Search menu items
         search = request.query_params.get('search')
 
+        # Order menu items
+        ordering = request.query_params.get('ordering')
+
 # Use 2 underscores -> linked to category model and linked to menu model
         if category_name:
             items = items.filter(category__title=category_name)
@@ -84,6 +87,14 @@ def menu_items_des(request):
         if search:
             items = items.filter(title__icontains=search)
         
+        # Ordering by price only
+        """ if ordering:
+            items = items.order_by(ordering) """
+        
+        # Ordering by price then inventory
+        if ordering:
+            ordering_fields = ordering.split(",")
+            items = items.order_by(*ordering_fields)
 
         serialized_item =MenuItemsSerializer(items, many=True)
         return Response(serialized_item.data)
