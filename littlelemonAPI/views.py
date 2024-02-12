@@ -19,11 +19,11 @@ from rest_framework_csv.renderers import CSVRenderer
 
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
-    serializer_class = MenuItemSerializer
+    serializer_class = MenuItemsSerializer
 
 class SingleMenuItemView(generics.RetrieveUpdateAPIView, generics.DestroyAPIView):
     queryset = MenuItem.objects.all()
-    serializer_class = MenuItemSerializer
+    serializer_class = MenuItemsSerializer
 
 @api_view()
 def menu_items(request):
@@ -54,10 +54,20 @@ def category_detail(request, pk):
 def menu_items_des(request):
     if request.method == 'GET':
         items = MenuItem.objects.select_related('category').all()
-        serialized_item = MenuItemsSerializer(items, many=True)
+        # Filtering menu items
+        category_name = request.query_params.get('category')
+        to_price = request.query_params.get('to_price')
+
+# Use 2 underscores -> linked to category model and linked to menu model
+        if category_name:
+            items = items.filter(category__title=category_name)
+
+        if to_price:
+            items = items.filter(price__lte=to_price)#lte means price is less than or equal to a value
+        serialized_item =MenuItemsSerializer(items, many=True)
         return Response(serialized_item.data)
     
-    if request.method == 'POST':
+    elif request.method == 'POST':
         serialized_item = MenuItemsSerializer(data=request.data)
         serialized_item.is_valid(raise_exception=True)
         serialized_item.save()
