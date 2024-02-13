@@ -3,6 +3,9 @@ from .models import MenuItem
 from .models import Category
 from decimal import Decimal
 
+# For data sanitization
+import bleach
+
 # Unique validator - uniqueness of a single field, i.e. no duplicates
 from rest_framework.validators import UniqueValidator
 
@@ -47,12 +50,15 @@ class MenuItemsSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Stock cannot be negative")  """
     
     # OPTION 4: Using the validate() method
-    """ def validate(self, attrs):
+    def validate(self, attrs):
+         # OPTION 2: Data sanitization title
+        attrs['title'] = bleach.clean(attrs['title'])
         if(attrs['price']<2):
             raise serializers.ValidationError('Price should not be less than 2.00')
-        if(attrs['stock']<0):
-            raise serializers.ValidationError('Stock cannot be a negative value')
-        return super().validate(attrs) """
+          # This has a key error!!
+        """ if(attrs['stock']<0):
+            raise serializers.ValidationError('Stock cannot be a negative value') """
+        return super().validate(attrs)
 
     # HYPERLINK RELATED FIELD
     """ category = serializers.HyperlinkedRelatedField(
@@ -68,6 +74,9 @@ class MenuItemsSerializer(serializers.ModelSerializer):
         validators = [UniqueValidator(queryset=MenuItem.objects.all())]
     )
  """
+    #OPTION 1: Data sanitization on title using bleach
+    """ def validate_title(self,value):
+        return bleach.clean(value) """
 
 
     class Meta:
