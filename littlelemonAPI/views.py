@@ -17,6 +17,9 @@ from rest_framework_yaml.renderers import YAMLRenderer
 # CSV Renderer
 from rest_framework_csv.renderers import CSVRenderer
 
+# Pagination
+from django.core.paginator import Paginator, EmptyPage
+
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemsSerializer
@@ -64,6 +67,10 @@ def menu_items_des(request):
         # Order menu items
         ordering = request.query_params.get('ordering')
 
+        # Pagination
+        perpage = request.query_params.get('perpage', default=2)
+        page = request.query_params.get('page', default=1)
+
 # Use 2 underscores -> linked to category model and linked to menu model
         if category_name:
             items = items.filter(category__title=category_name)
@@ -95,6 +102,15 @@ def menu_items_des(request):
         if ordering:
             ordering_fields = ordering.split(",")
             items = items.order_by(*ordering_fields)
+
+        
+        # Pagination
+        paginator = Paginator(items, per_page=perpage)
+        try:
+            items = paginator.page(number=page)
+        except EmptyPage:
+            items =[]
+
 
         serialized_item =MenuItemsSerializer(items, many=True)
         return Response(serialized_item.data)
