@@ -14,4 +14,7 @@ urlpatterns =[
     path('welcome', views.welcome),
     path('menu-items-csv', views.menu_items_csv),
     path('menu-items-yaml', views.menu_items_yaml),
+    #Viewsets
+    path('menu-items-view', views.MenuItemsViewSet.as_view({'get': 'list'})),
+    path('menu-items-view/<int:pk>', views.MenuItemsViewSet.as_view({'get': 'retrieve'})),
 ]
