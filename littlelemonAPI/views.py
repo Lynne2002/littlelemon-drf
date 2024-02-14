@@ -5,7 +5,7 @@ from .serializers import MenuItemSerializer, MenuItemsSerializer, CategorySerial
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import status, viewsets
 
 # TemplateHTMLRenderer & StaticHTMLRenderer
 from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
@@ -27,6 +27,15 @@ class MenuItemsView(generics.ListCreateAPIView):
 class SingleMenuItemView(generics.RetrieveUpdateAPIView, generics.DestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemsSerializer
+
+# STEP 1: Implementing a class-based view for filtering, searching and pagination
+class MenuItemsViewSet(viewsets.ModelViewSet):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemsSerializer
+    ordering_fields =  ['price', 'inventory']
+    #search_fields = ['title']
+    # Searching in the related model - food, drinks categories
+    search_fields = ['title', 'category__title']
 
 @api_view()
 def menu_items(request):
