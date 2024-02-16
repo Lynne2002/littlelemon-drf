@@ -20,6 +20,10 @@ from rest_framework_csv.renderers import CSVRenderer
 # Pagination
 from django.core.paginator import Paginator, EmptyPage
 
+#Token-based authentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
+
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemsSerializer
@@ -163,3 +167,9 @@ def menu_items_yaml(request):
     # add context for hyperlinks display
     serialized_item = MenuHyperItemsSerializer(items, many=True, context={'request': request})
     return Response(serialized_item.data)
+
+# Protected API endpoint
+@api_view()
+@permission_classes([IsAuthenticated])
+def secret(request):
+    return Response({"message": "Some secret message"})
