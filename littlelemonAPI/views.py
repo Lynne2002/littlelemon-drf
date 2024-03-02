@@ -209,3 +209,18 @@ def throttle_check_auth(request):
 @throttle_classes([TenCallsPerMinute])
 def throttle_check_auth(request):
     return Response({"message": "message for the logged in users only"})
+
+# API Throttling for class-based views
+class MenuItemsViewSetThrottle(viewsets.ModelViewSet):
+    #throttle_classes =[AnonRateThrottle, UserRateThrottle]
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemsSerializer
+
+    # Conditional throttling
+    def get_throttles(self):
+        if self.action == 'create': #POST call
+            throttle_classes = [UserRateThrottle]
+        else:
+            throttle_classes = []
+
+        return [throttle() for throttle in throttle_classes]
