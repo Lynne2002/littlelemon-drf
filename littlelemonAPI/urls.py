@@ -23,4 +23,8 @@ urlpatterns =[
     path('api-token-auth/', obtain_auth_token),
     # Manager view
     path('manager-view/',views.manager_view),
+    # Throttle check
+    path('throttle-check', views.throttle_check),
+    path('throttle-check-auth', views.throttle_check_auth),
+
 ]
