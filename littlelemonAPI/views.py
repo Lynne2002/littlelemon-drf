@@ -2,10 +2,11 @@ from rest_framework import generics
 from .models import MenuItem
 from .models import Category
 from .serializers import MenuItemSerializer, MenuItemsSerializer, CategorySerializer, MenuHyperItemsSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
+from .throttles import TenCallsPerMinute
 
 # TemplateHTMLRenderer & StaticHTMLRenderer
 from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
@@ -23,6 +24,9 @@ from django.core.paginator import Paginator, EmptyPage
 #Token-based authentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
+
+#API Throttling
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
@@ -182,3 +186,26 @@ def manager_view(request):
         return Response({"message": "Only Manager should see this"})
     else:
         return Response({"message": "You are not authorized"}, 403)
+    
+# Unauthenticated/anonymous users can call 10 times
+@api_view()
+@throttle_classes([AnonRateThrottle])
+def throttle_check(request):
+    content ={
+        "message": "successful"
+    }
+    return Response(content)
+
+#Throttling for authenticated users
+@api_view()
+@permission_classes([IsAuthenticated])
+@throttle_classes([UserRateThrottle])
+def throttle_check_auth(request):
+    return Response({"message": "message for the logged in users only"})
+
+#Throttling for authenticated users using throttles.py file
+@api_view()
+@permission_classes([IsAuthenticated])
+@throttle_classes([TenCallsPerMinute])
+def throttle_check_auth(request):
+    return Response({"message": "message for the logged in users only"})
