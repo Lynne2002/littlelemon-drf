@@ -13,6 +13,7 @@ djangorestframework-yaml = "*"
 bleach = "*"
 django-filter = "*"
 djoser = "*"
+djangorestframework-simplejwt = "~=5.2.1"
 
 [dev-packages]
 
