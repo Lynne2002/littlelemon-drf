@@ -22,11 +22,13 @@ from rest_framework_csv.renderers import CSVRenderer
 from django.core.paginator import Paginator, EmptyPage
 
 #Token-based authentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import permission_classes
 
 #API Throttling
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+
+from django.contrib.auth.models import User, Group
 
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
@@ -224,3 +226,18 @@ class MenuItemsViewSetThrottle(viewsets.ModelViewSet):
             throttle_classes = []
 
         return [throttle() for throttle in throttle_classes]
+
+#Adding and removing users to manager group
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def managers(request):
+    username = request.data['username']
+    if username:
+        user = get_object_or_404(User, username=username)
+        managers = Group.objects.get(name="Manager")
+        if request.method == 'POST':
+            managers.user_set.add(user)
+        elif request.method == 'DELETE':
+            managers.user_set.remove(user)
+        return Response({"message": "ok"})
+    return Response({"message":"error"}, status.HTTP_400_BAD_REQUEST)
