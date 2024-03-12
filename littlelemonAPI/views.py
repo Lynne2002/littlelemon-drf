@@ -218,7 +218,7 @@ class MenuItemsViewSetThrottle(viewsets.ModelViewSet):
 
     # Conditional throttling
     def get_throttles(self):
-        if self.action == 'create': #POST call
+        if self.action == 'create': #POST call, for GET call it's 'list'
             throttle_classes = [UserRateThrottle]
         else:
             throttle_classes = []
