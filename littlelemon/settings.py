@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'littlelemonAPI',
     'debug_toolbar',
     'djoser',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
